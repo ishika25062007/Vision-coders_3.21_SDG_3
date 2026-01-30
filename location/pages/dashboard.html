@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AEROPULSE Dashboard</title>
+
+  <link rel="stylesheet" href="../assets/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <!-- 🔹 NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <!-- Company Logo -->
+      <img src="../../home/image/letter-a.png" alt="Company Logo" class="nav-logo" />
+    </div>
+
+    <div class="nav-right">
+      <a href="../../home/home.html">Home</a>
+      <a href="#">Weather</a>
+      <a href="../../subcription page/subscription/index1.html">Subscriptions</a>
+    </div>
+  </nav>
+
+<main class="dashboard">
+
+  <!-- LEFT -->
+  <section class="left">
+
+    <div class="card interactive">
+      <h3>Pollution Impact Radar</h3>
+      <canvas id="radarChart"></canvas>
+    </div>
+
+    <div class="card interactive">
+      <h3>3D Pollution Columns</h3>
+      <canvas id="columnChart"></canvas>
+    </div>
+
+  </section>
+
+  <!-- RIGHT -->
+  <section class="right">
+
+    <div class="card interactive pros">
+      <h3 style="color: white;">Advantages</h3>
+      <ul id="prosList" style="font-weight: bold;"></ul>
+    </div>
+
+    <div class="card interactive cons">
+      <h3 style="color: white;">Disadvantages</h3>
+
+      <ul id="consList" style="font-weight: bold;"></ul>
+    </div>
+
+    <div class="card interactive info">
+      <h3 style="color: white;">Health Impact</h3>
+      <p>🤧 Asthma: <strong id="asthma"></strong></p>
+      <p>🫁 COPD: <strong id="copd"></strong></p>
+      <p>😷 Bronchitis: <strong id="bronchitis"></strong></p>
+    </div>
+
+    <div class="card interactive info">
+      <h3 style="color: white;">Outdoor Recommendation</h3>
+      <p id="recommendation"></p>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="../assets/dashboard.js"></script>
+</body>
+</html>

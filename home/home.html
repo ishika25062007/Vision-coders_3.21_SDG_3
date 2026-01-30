@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | AEROPULSE</title>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="home.css" />
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Heatmap Plugin (local copy from npm leaflet.heat) -->
+<script src="vendor/leaflet-heat.js"></script>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</head>
+
+
+<body>
+
+  <!-- 🔹 NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <!-- Company Logo -->
+      <img src="image/letter-a.png" alt="Company Logo" class="nav-logo" />
+    </div>
+
+    <div class="nav-right">
+      <a href="../home/home.html">Home</a>
+      <a href="#">Weather</a>
+      <a href="../subcription page/subscription/index1.html">Subscriptions</a>
+    </div>
+  </nav>
+
+  <!-- 🔹 HOME TOP SECTION -->
+  <section class="home-top">
+    <div class="left-controls">
+
+      <!-- Search Bar with Button -->
+      <div class="search-container">
+        <input type="text" placeholder="Search..." class="search-bar" />
+        <button class="search-btn">
+          <img src="image/search.png" alt="Search" />
+        </button>
+      </div>
+
+      <!-- Right Buttons -->
+      <div class="right-buttons">
+        <!-- Dashboard Button -->
+        <a href="../location/pages/dashboard.html">
+  <button class="dashboard-btn">Dashboard</button>
+</a>
+
+
+        <!-- Request API Button with PNG -->
+        <a href="../subcription page/subscription/index1.html" class="api-link">
+  <button class="api-btn">
+    <img src="image/crown.png" class="api-icon-space" alt="API Icon">
+    Request API
+  </button>
+</a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 🌍 Cesium Map Section -->
+  <section class="map-section">
+    <div id="cesiumContainer"></div> <!-- Cesium will render here -->
+  </section>
+
+<!-- 📊 Chart Row (Below Map, Left Side) -->
+<section class="chart-row">
+  <div class="chart-card">
+    <h3>AQI Trend Analysis</h3>
+    <canvas id="aqiChart"></canvas>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+  <!-- 🔹 Custom JS -->
+  <script src="home.js"></script>
+  <!-- Cesium JS -->
+  <script src="node_modules/cesium/Build/Cesium/Cesium.js"></script>
+
+
+</body>
+</html>
