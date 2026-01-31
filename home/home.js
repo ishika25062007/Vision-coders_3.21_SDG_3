@@ -100,13 +100,95 @@ window.onload = function () {
   const searchInput = document.querySelector(".search-bar");
   const searchBtn = document.querySelector(".search-btn");
 
-  function showHighAQIAlert(cityName, aqi) {
+  // 📧 EmailJS Initialization
+  if (typeof CONFIG !== 'undefined' && CONFIG.EMAILJS_PUBLIC_KEY) {
+    emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY);
+    console.log("✅ EmailJS Initialized");
+  }
+
+  // 🌡️ Risk Levels (EPA Mapping)
+  const EPA_RISK_LABELS = {
+    1: "Good 🟢",
+    2: "Moderate 🟡",
+    3: "Unhealthy for Sensitive Groups 🟠",
+    4: "Unhealthy 🔴",
+    5: "Very Unhealthy 🟣",
+    6: "Hazardous ☠️"
+  };
+
+  async function sendAlertEmail(cityName, aqiLabel, rawValue) {
+    console.log(`📧 Attempting to send alert email for ${cityName}...`);
+    try {
+      if (typeof getCurrentUser !== 'function') {
+        process.env.NODE_ENV !== 'production' && console.warn("getCurrentUser not found");
+        return;
+      }
+
+      const user = await getCurrentUser();
+      if (!user || !user.email) return;
+
+      const templateParams = {
+        to_email: user.email,
+        to_name: user.email.split('@')[0],
+        city: cityName,
+        aqi_level: aqiLabel,
+        message: `High pollution warning for ${cityName}! The AQI status is ${aqiLabel}. Please take precautions.`
+      };
+
+      await emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, templateParams);
+      console.log("✅ Alert email sent to:", user.email);
+    } catch (err) {
+      console.error("❌ Email failed:", err);
+    }
+  }
+
+  function showAQINotification(cityName, aqiLabel, epaIndex) {
     const modal = document.getElementById("aqi-alert-modal");
     if (!modal) return;
 
+    // Adjust title and icon based on severity
+    const isAlert = epaIndex >= 3;
+    const title = isAlert ? "Pollution Alert" : "Air Quality Update";
+    const icon = isAlert ? "⚠️" : "ℹ️";
+
+    // Update Modal Header
+    modal.querySelector("h3").innerText = title;
+    modal.querySelector(".warning-icon").innerText = icon;
+
+    // Update Modal Content
     document.getElementById("alert-city").innerText = cityName;
-    document.getElementById("alert-aqi").innerText = aqi;
+    document.getElementById("alert-aqi").innerText = aqiLabel;
+
+    // Update body text based on severity
+    const bodyText = modal.querySelector(".modal-body p");
+    if (!isAlert) {
+      bodyText.innerHTML = `The air quality in <strong>${cityName}</strong> is currently <strong>${aqiLabel}</strong>. It's a great time for outdoor activities!`;
+      modal.classList.remove("warning-glow");
+      modal.classList.add("info-glow");
+    } else {
+      bodyText.innerHTML = `Warning: The air quality in <strong>${cityName}</strong> is currently <strong>${aqiLabel}</strong>. Please take necessary precautions.`;
+      modal.classList.remove("info-glow");
+      modal.classList.add("warning-glow");
+    }
+
     modal.style.display = "flex";
+
+    // Only send email for High AQI (threshold >= 3) to avoid spamming the user's inbox
+    if (isAlert) {
+      sendAlertEmail(cityName, aqiLabel);
+    }
+  }
+
+  // 📏 Distance Helper (Haversine Formula)
+  function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   }
 
   // Exposed to global for onclick
@@ -115,6 +197,27 @@ window.onload = function () {
     if (modal) modal.style.display = "none";
   };
 
+  // 🌍 Check AQI for coordinates
+  async function checkLiveAQI(lat, lon, locationLabel) {
+    const WEATHER_KEY = typeof CONFIG !== 'undefined' ? CONFIG.WEATHER_API_KEY : "";
+    if (!WEATHER_KEY || WEATHER_KEY.includes("YOUR")) return;
+
+    try {
+      const res = await fetch(`https://api.weatherapi.com/v1/current.json?key=${WEATHER_KEY}&q=${lat},${lon}&aqi=yes`);
+      const data = await res.json();
+
+      if (data.current && data.current.air_quality) {
+        const epaIndex = data.current.air_quality["us-epa-index"];
+        const city = data.location.name;
+
+        // Show notification for ALL levels as requested by the user
+        showAQINotification(locationLabel || city, EPA_RISK_LABELS[epaIndex], epaIndex);
+      }
+    } catch (err) {
+      console.error("Live AQI check failed:", err);
+    }
+  }
+
   function searchCity() {
     const query = searchInput.value.trim().toLowerCase();
     if (!query) return;
@@ -122,72 +225,49 @@ window.onload = function () {
     const city = cities.find(c => c.name.toLowerCase() === query);
 
     if (city) {
-      map.flyTo([city.lat, city.lon], 12, {
-        animate: true,
-        duration: 1.5
-      });
+      map.flyTo([city.lat, city.lon], 12, { animate: true, duration: 1.5 });
 
       L.popup()
         .setLatLng([city.lat, city.lon])
-        .setContent(`
-          <div style="text-align: center;">
-            <h3 style="margin: 0; color: #333;">${city.name}</h3>
-            <p style="margin: 5px 0;">AQI Intensity: <strong>${city.aqi}</strong></p>
-          </div>
-        `)
+        .setContent(`<div style="text-align: center;"><h3>${city.name}</h3><p>AQI Intensity: ${city.aqi}</p></div>`)
         .openOn(map);
 
-      // 🚨 High AQI Alert check
-      if (city.aqi > 0.7) {
-        setTimeout(() => showHighAQIAlert(city.name, city.aqi), 1500);
-      }
+      // Check live data for searching city too
+      checkLiveAQI(city.lat, city.lon, city.name);
 
     } else {
-      alert("City not found! Please try a major Indian city like 'Delhi', 'Mumbai', 'Indore', etc.");
+      alert("City not found! Please try a major city.");
     }
   }
 
   // 🖱️ Event Listeners
-  if (searchBtn) {
-    searchBtn.addEventListener("click", searchCity);
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        searchCity();
-      }
-    });
-  }
+  if (searchBtn) searchBtn.addEventListener("click", searchCity);
+  if (searchInput) searchInput.addEventListener("keydown", (e) => (e.key === "Enter" && searchCity()));
 
   // 📍 USER LOCATION DETECTION
   if (navigator.geolocation) {
-
-    navigator.geolocation.getCurrentPosition(function (position) {
-
-      var lat = position.coords.latitude;
-      var lon = position.coords.longitude;
+    navigator.geolocation.getCurrentPosition(async function (position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
 
       map.setView([lat, lon], 13);
+      L.marker([lat, lon]).addTo(map).bindPopup("📍 You are here").openPopup();
 
-      L.marker([lat, lon]).addTo(map)
-        .bindPopup("📍 You are here")
-        .openPopup();
+      // 1. Trigger Live Alert for user's exact current location
+      await checkLiveAQI(lat, lon, "Your Current Location");
 
-      // Check if user is near a high AQI city
+      // 2. 🏠 30km Proximity Check: Detect if user is near a major city
       cities.forEach(city => {
-        const dist = Math.sqrt(Math.pow(city.lat - lat, 2) + Math.pow(city.lon - lon, 2));
-        if (dist < 0.2 && city.aqi > 0.7) { // Very close (approx ~20km) and high AQI
-          showHighAQIAlert(city.name + " (Near you)", city.aqi);
+        const distance = getDistance(lat, lon, city.lat, city.lon);
+        if (distance <= 30) {
+          console.log(`🏠 Proximity Detected: within ${distance.toFixed(1)}km of ${city.name}`);
+          checkLiveAQI(city.lat, city.lon, `${city.name} (Near You)`);
         }
       });
 
     }, function () {
-      alert("Location access denied. Showing default map view.");
+      console.warn("Location access denied.");
     });
-
-  } else {
-    alert("Geolocation is not supported by your browser.");
   }
 
   // 📈 AQI LINE CHART
@@ -228,10 +308,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.querySelector("#send-btn");
   const chatMessages = document.querySelector("#chat-messages");
 
-  // 🔑 API KEY (Placeholder)
-  // ⚠️ REPLACE THIS WITH YOUR ACTUAL API KEY
   // 🔑 API KEY (From config.js)
-  const OPENAI_API_KEY = typeof CONFIG !== 'undefined' ? CONFIG.OPENAI_API_KEY : "";
+  const GEMINI_API_KEY = typeof CONFIG !== 'undefined' ? CONFIG.GEMINI_API_KEY : "";
 
   function appendMessage(text, sender) {
     const msgDiv = document.createElement("div");
@@ -251,52 +329,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getMockResponse(input) {
     const lower = input.toLowerCase();
-    if (lower.includes("hello") || lower.includes("hi")) return "Hello! I'm your AI Assistant (Demo Mode). Ask me about AQI or health tips!";
+    if (lower.includes("hello") || lower.includes("hi")) return "Hello! I'm your Gemini-powered Assistant. Ask me about AQI or health tips!";
     if (lower.includes("aqi") || lower.includes("pollution")) return "The Air Quality Index (AQI) is a measure of how polluted the air is. High AQI means poor air quality!";
     if (lower.includes("health") || lower.includes("safe")) return "On high AQI days, it's best to wear a mask and limit outdoor activities. Stay safe!";
-    return "I am currently in Demo Mode (API Quota Exceeded). I can answer simple questions about AQI and Health!";
+    return "I am here to help you with AQI and environmental health questions!";
   }
 
   async function getBotResponse(userMessage) {
-    if (!OPENAI_API_KEY || OPENAI_API_KEY.includes("YOUR")) {
-      return "I can't connect to the server right now (Missing API Key). But I can tell you that reducing car usage helps AQI!";
+    if (!GEMINI_API_KEY || GEMINI_API_KEY.includes("YOUR")) {
+      return "I can't connect to the server right now (Missing Gemini API Key). But I can tell you that reducing car usage helps AQI!";
     }
 
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${OPENAI_API_KEY}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: userMessage }]
+          contents: [{
+            parts: [{ text: userMessage }]
+          }]
         })
       });
 
       const data = await response.json();
 
-      // Check for API errors
       if (!response.ok) {
-        const errorMessage = data.error?.message || "";
-
-        // ⚠️ FALLBACK: If quota exceeded, use local mock bot
-        if (errorMessage.includes("quota") || errorMessage.includes("insufficient_quota")) {
+        const errorMessage = data.error?.message || "Unknown error";
+        if (errorMessage.includes("quota") || errorMessage.includes("limit")) {
           return getMockResponse(userMessage);
         }
-
-        return `⚠️ API Error: ${errorMessage}`;
+        return `⚠️ Gemini API Error: ${errorMessage}`;
       }
 
-      if (data.choices && data.choices.length > 0) {
-        return data.choices[0].message.content;
+      if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+        return data.candidates[0].content.parts[0].text;
       } else {
-        return "I'm having trouble processing that thought (Empty response).";
+        return "I'm having trouble processing that thought (Empty response from Gemini).";
       }
     } catch (error) {
       console.error("Chatbot Error:", error);
-      return "Sorry, connection failed. Please check your internet.";
+      return "Sorry, connection to Gemini failed. Please check your internet.";
     }
   }
 

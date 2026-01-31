@@ -154,16 +154,19 @@
     <div class="footer-content">
 
       <!-- Column 1: Brand -->
-      <div class="footer-col">
-        <div class="nav-left" style="margin-bottom: 15px; padding-left: 0;">
-          <img src="image/letter-a.png" alt="Logo" class="nav-logo" style="height: 35px;">
+      <div class="footer-col brand-col">
+        <div class="footer-logo">
+          <img src="image/letter-a.png" alt="Logo" class="nav-logo">
           <span class="brand-name">AEROPULSE</span>
         </div>
         <p>Empowering cities with real-time air quality intelligence and AI-driven health forecasts.</p>
         <div class="social-links">
-          <a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/twitter.png" alt="Twitter"></a>
-          <a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/linkedin.png" alt="LinkedIn"></a>
-          <a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/github.png" alt="GitHub"></a>
+          <a href="#" aria-label="Twitter"><img src="https://img.icons8.com/ios-filled/50/ffffff/twitter.png"
+              alt="Twitter"></a>
+          <a href="#" aria-label="LinkedIn"><img src="https://img.icons8.com/ios-filled/50/ffffff/linkedin.png"
+              alt="LinkedIn"></a>
+          <a href="#" aria-label="GitHub"><img src="https://img.icons8.com/ios-filled/50/ffffff/github.png"
+              alt="GitHub"></a>
         </div>
       </div>
 
@@ -208,8 +211,40 @@
     </div>
   </footer>
 
+  <!-- 🚨 AQI Alert Modal -->
+  <div id="aqi-alert-modal" class="modal-overlay">
+    <div class="glass-card modal-content warning-glow">
+      <div class="modal-header">
+        <span class="warning-icon">⚠️</span>
+        <h3>High Pollution Alert</h3>
+        <button class="close-modal" onclick="closeAQIAlert()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Air Quality in <strong id="alert-city">...</strong> has reached a concerning level.</p>
+        <div class="aqi-badge">
+          AQI Status: <span id="alert-aqi" style="font-weight: bold;">...</span>
+        </div>
+        <div class="health-tips">
+          <h4>💡 Health Safety Tips:</h4>
+          <ul>
+            <li>😷 Wear an N95 mask outdoors.</li>
+            <li>🏠 Keep windows closed and stay indoors.</li>
+            <li>🌬️ Use an air purifier if available.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="primary-btn" onclick="closeAQIAlert()">Understood</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 🔹 Custom JS -->
+  <!-- 🔹 Auth & App Data -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="../config.js"></script>
+  <script src="../logopopup/auth.js"></script>
   <script src="../common.js"></script>
   <script src="home.js"></script>
   <!-- Cesium JS -->
