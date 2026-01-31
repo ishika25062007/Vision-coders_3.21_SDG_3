@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>AEROPULSE Dashboard</title>
@@ -13,64 +14,108 @@
   <!-- 🔹 NAVBAR -->
   <nav class="navbar">
     <div class="nav-left">
-      <!-- Company Logo -->
-      <img src="../../home/image/letter-a.png" alt="Company Logo" class="nav-logo" />
+      <img src="../../home/image/letter-a.png" alt="Logo" class="nav-logo" />
+      <span class="brand-name">AEROPULSE</span>
+    </div>
+
+    <!-- 🏙️ City Selector (Center) -->
+    <div class="city-selector">
+      <select id="citySelect">
+        <!-- Options populated by JS -->
+      </select>
     </div>
 
     <div class="nav-right">
       <a href="../../home/home.html">Home</a>
-      <a href="#">Weather</a>
-      <a href="../../subcription page/subscription/index1.html">Subscriptions</a>
+      <a href="../../subcription page/subscription/index1.html" class="active">Subscriptions</a>
+      <a href="#" onclick="signOut()">Logout</a>
     </div>
   </nav>
 
-<main class="dashboard">
+  <main class="dashboard-grid">
 
-  <!-- LEFT -->
-  <section class="left">
+    <!-- 📊 TOP STATS ROW -->
+    <section class="stats-row">
+      <div class="glass-card stat-card">
+        <h3>Current AQI</h3>
+        <div class="stat-value" id="aqiValue">--</div>
+        <p class="stat-label">Real-time Index</p>
+      </div>
 
-    <div class="card interactive">
-      <h3>Pollution Impact Radar</h3>
-      <canvas id="radarChart"></canvas>
-    </div>
+      <div class="glass-card stat-card">
+        <h3>Risk Level</h3>
+        <div class="stat-value" id="riskLevel">--</div>
+        <p class="stat-label">Health Implication</p>
+      </div>
 
-    <div class="card interactive">
-      <h3>3D Pollution Columns</h3>
-      <canvas id="columnChart"></canvas>
-    </div>
+      <div class="glass-card stat-card">
+        <h3>Dominant Pollutant</h3>
+        <div class="stat-value" id="dominantPollutant">PM2.5</div>
+        <p class="stat-label">Primary Concern</p>
+      </div>
+    </section>
 
-  </section>
+    <!-- 📈 CHARTS ROW -->
+    <section class="charts-row">
+      <!-- Radar Chart -->
+      <div class="glass-card chart-card">
+        <h3>Pollutant Breakdown</h3>
+        <div class="chart-container">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
 
-  <!-- RIGHT -->
-  <section class="right">
+      <!-- Bar Chart -->
+      <div class="glass-card chart-card">
+        <h3>Comparative Analysis</h3>
+        <div class="chart-container">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+    </section>
 
-    <div class="card interactive pros">
-      <h3 style="color: white;">Advantages</h3>
-      <ul id="prosList" style="font-weight: bold;"></ul>
-    </div>
+    <!-- 🏥 HEALTH & DATA ROW -->
+    <section class="info-row">
 
-    <div class="card interactive cons">
-      <h3 style="color: white;">Disadvantages</h3>
+      <!-- Advantages -->
+      <div class="glass-card list-card">
+        <h3>Environmental Pros</h3>
+        <ul id="prosList"></ul>
+      </div>
 
-      <ul id="consList" style="font-weight: bold;"></ul>
-    </div>
+      <!-- Disadvantages -->
+      <div class="glass-card list-card">
+        <h3>Environmental Cons</h3>
+        <ul id="consList"></ul>
+      </div>
 
-    <div class="card interactive info">
-      <h3 style="color: white;">Health Impact</h3>
-      <p>🤧 Asthma: <strong id="asthma"></strong></p>
-      <p>🫁 COPD: <strong id="copd"></strong></p>
-      <p>😷 Bronchitis: <strong id="bronchitis"></strong></p>
-    </div>
+      <!-- Health Impact -->
+      <div class="glass-card health-card">
+        <h3>Health Forecast</h3>
+        <div class="health-item">
+          <span>🤧 Asthma Risk:</span>
+          <strong id="asthmaRisk">--</strong>
+        </div>
+        <div class="health-item">
+          <span>🫁 COPD Risk:</span>
+          <strong id="copdRisk">--</strong>
+        </div>
+        <div class="health-item">
+          <span>🏃‍♂️ Outdoor:</span>
+          <strong id="outdoorRec">--</strong>
+        </div>
+        <div class="recommendation-box">
+          <p id="healthRec">Select a city to see recommendations.</p>
+        </div>
+      </div>
 
-    <div class="card interactive info">
-      <h3 style="color: white;">Outdoor Recommendation</h3>
-      <p id="recommendation"></p>
-    </div>
+    </section>
 
-  </section>
+  </main>
 
-</main>
-
-<script src="../assets/dashboard.js"></script>
+  <script src="../../config.js"></script>
+  <script src="../../common.js"></script>
+  <script src="../assets/dashboard.js"></script>
 </body>
+
 </html>

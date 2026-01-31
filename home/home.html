@@ -69,7 +69,7 @@
 
     <div class="nav-right">
       <a href="../home/home.html" class="active">Home</a>
-      <a href="#">Weather</a>
+      <a href="../weather/weather.html">Weather</a>
       <a href="../subcription page/subscription/index1.html">Subscriptions</a>
       <a href="#" onclick="signOut().then(() => window.location.href='../logopopup/logopop.html')">Logout</a>
     </div>
@@ -149,8 +149,68 @@
 
   </section>
 
+  <!-- 🦶 FOOTER -->
+  <footer class="glass-panel main-footer">
+    <div class="footer-content">
+
+      <!-- Column 1: Brand -->
+      <div class="footer-col">
+        <div class="nav-left" style="margin-bottom: 15px; padding-left: 0;">
+          <img src="image/letter-a.png" alt="Logo" class="nav-logo" style="height: 35px;">
+          <span class="brand-name">AEROPULSE</span>
+        </div>
+        <p>Empowering cities with real-time air quality intelligence and AI-driven health forecasts.</p>
+        <div class="social-links">
+          <a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/twitter.png" alt="Twitter"></a>
+          <a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/linkedin.png" alt="LinkedIn"></a>
+          <a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/github.png" alt="GitHub"></a>
+        </div>
+      </div>
+
+      <!-- Column 2: Quick Links -->
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="../home/home.html">Home</a></li>
+          <li><a href="../location/pages/dashboard.html">Dashboard</a></li>
+          <li><a href="../subcription page/subscription/index1.html">Pricing</a></li>
+          <li><a href="#">Live Map</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 3: Resources -->
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">API Documentation</a></li>
+          <li><a href="#">Health Guidelines</a></li>
+          <li><a href="#">Research Papers</a></li>
+          <li><a href="#">Community</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 4: Contact -->
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <p>📍 Mumbai, India</p>
+        <p>📧 support@aeropulse.com</p>
+        <p>📞 +91 98765 43210</p>
+      </div>
+
+    </div>
+
+    <div class="footer-bar">
+      <p>&copy; 2026 AEROpulse. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
   <!-- 🔹 Custom JS -->
   <script src="../config.js"></script>
+  <script src="../common.js"></script>
   <script src="home.js"></script>
   <!-- Cesium JS -->
   <script src="node_modules/cesium/Build/Cesium/Cesium.js"></script>

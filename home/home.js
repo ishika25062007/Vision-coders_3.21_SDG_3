@@ -100,21 +100,33 @@ window.onload = function () {
   const searchInput = document.querySelector(".search-bar");
   const searchBtn = document.querySelector(".search-btn");
 
+  function showHighAQIAlert(cityName, aqi) {
+    const modal = document.getElementById("aqi-alert-modal");
+    if (!modal) return;
+
+    document.getElementById("alert-city").innerText = cityName;
+    document.getElementById("alert-aqi").innerText = aqi;
+    modal.style.display = "flex";
+  }
+
+  // Exposed to global for onclick
+  window.closeAQIAlert = function () {
+    const modal = document.getElementById("aqi-alert-modal");
+    if (modal) modal.style.display = "none";
+  };
+
   function searchCity() {
     const query = searchInput.value.trim().toLowerCase();
     if (!query) return;
 
-    // Find city (exact or partial match)
     const city = cities.find(c => c.name.toLowerCase() === query);
 
     if (city) {
-      // ✈️ Fly to the city
       map.flyTo([city.lat, city.lon], 12, {
         animate: true,
         duration: 1.5
       });
 
-      // 📍 Add a temporary popup
       L.popup()
         .setLatLng([city.lat, city.lon])
         .setContent(`
@@ -124,6 +136,11 @@ window.onload = function () {
           </div>
         `)
         .openOn(map);
+
+      // 🚨 High AQI Alert check
+      if (city.aqi > 0.7) {
+        setTimeout(() => showHighAQIAlert(city.name, city.aqi), 1500);
+      }
 
     } else {
       alert("City not found! Please try a major Indian city like 'Delhi', 'Mumbai', 'Indore', etc.");
@@ -151,13 +168,19 @@ window.onload = function () {
       var lat = position.coords.latitude;
       var lon = position.coords.longitude;
 
-      // Zoom map to user's location
       map.setView([lat, lon], 13);
 
-      // Add marker
       L.marker([lat, lon]).addTo(map)
         .bindPopup("📍 You are here")
         .openPopup();
+
+      // Check if user is near a high AQI city
+      cities.forEach(city => {
+        const dist = Math.sqrt(Math.pow(city.lat - lat, 2) + Math.pow(city.lon - lon, 2));
+        if (dist < 0.2 && city.aqi > 0.7) { // Very close (approx ~20km) and high AQI
+          showHighAQIAlert(city.name + " (Near you)", city.aqi);
+        }
+      });
 
     }, function () {
       alert("Location access denied. Showing default map view.");
@@ -168,7 +191,6 @@ window.onload = function () {
   }
 
   // 📈 AQI LINE CHART
-
   const ctx = document.getElementById('aqiChart').getContext('2d');
 
   const aqiChart = new Chart(ctx, {
