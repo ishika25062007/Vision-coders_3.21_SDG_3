@@ -9,30 +9,144 @@ window.onload = function () {
   }).addTo(map);
 
   // 🌡️ AQI Heatmap layer (intensity = pollution level 0–1)
-  var aqiData = [
-    [28.6139, 77.2090, 0.9],  // Delhi - Very High
-    [19.0760, 72.8777, 0.7],  // Mumbai
-    [22.5726, 88.3639, 0.6],  // Kolkata
-    [13.0827, 80.2707, 0.5],  // Chennai
-    [12.9716, 77.5946, 0.4],  // Bangalore
-    [17.3850, 78.4867, 0.65], // Hyderabad
-    [26.9124, 75.7873, 0.55]  // Jaipur
+
+  // 🏙️ Structured City Data (for Search & Heatmap)
+  const cities = [
+    { name: "Delhi", lat: 28.6139, lon: 77.2090, aqi: 0.95 },
+    { name: "Mumbai", lat: 19.0760, lon: 72.8777, aqi: 0.75 },
+    { name: "Kolkata", lat: 22.5726, lon: 88.3639, aqi: 0.70 },
+    { name: "Chennai", lat: 13.0827, lon: 80.2707, aqi: 0.65 },
+    { name: "Bangalore", lat: 12.9716, lon: 77.5946, aqi: 0.60 },
+    { name: "Hyderabad", lat: 17.3850, lon: 78.4867, aqi: 0.68 },
+    { name: "Jaipur", lat: 26.9124, lon: 75.7873, aqi: 0.62 },
+    { name: "Ahmedabad", lat: 23.0225, lon: 72.5714, aqi: 0.64 },
+    { name: "Pune", lat: 18.5204, lon: 73.8567, aqi: 0.58 },
+    { name: "Surat", lat: 21.1702, lon: 72.8311, aqi: 0.66 },
+
+    { name: "Patna", lat: 25.5941, lon: 85.1376, aqi: 0.72 },
+    { name: "Lucknow", lat: 26.8467, lon: 80.9462, aqi: 0.74 },
+    { name: "Chandigarh", lat: 30.7333, lon: 76.7794, aqi: 0.61 },
+    { name: "Amritsar", lat: 31.6340, lon: 74.8723, aqi: 0.67 },
+    { name: "Haridwar", lat: 29.9457, lon: 78.1642, aqi: 0.55 },
+    { name: "Dehradun", lat: 30.3165, lon: 78.0322, aqi: 0.53 },
+
+    { name: "Bhopal", lat: 23.2599, lon: 77.4126, aqi: 0.69 },
+    { name: "Indore", lat: 22.7196, lon: 75.8577, aqi: 0.71 },
+    { name: "Raipur", lat: 21.2514, lon: 81.6296, aqi: 0.63 },
+    { name: "Udaipur", lat: 24.5854, lon: 73.7125, aqi: 0.57 },
+
+    { name: "Panaji", lat: 15.4909, lon: 73.8278, aqi: 0.45 },
+    { name: "Coimbatore", lat: 11.0168, lon: 76.9558, aqi: 0.50 },
+    { name: "Thiruvananthapuram", lat: 8.5241, lon: 76.9366, aqi: 0.42 },
+    { name: "Kochi", lat: 9.9312, lon: 76.2673, aqi: 0.46 },
+    { name: "Kerala", lat: 10.8505, lon: 76.2711, aqi: 0.48 },
+
+    { name: "Vijayawada", lat: 16.5062, lon: 80.6480, aqi: 0.59 },
+    { name: "Nellore", lat: 14.4426, lon: 79.9865, aqi: 0.54 },
+    { name: "Vizianagaram", lat: 18.1124, lon: 83.3956, aqi: 0.56 },
+    { name: "Bhubaneswar", lat: 20.2961, lon: 85.8245, aqi: 0.67 },
+    { name: "Nagpur", lat: 21.1458, lon: 79.0882, aqi: 0.73 },
+
+    { name: "Imphal", lat: 24.8170, lon: 93.9368, aqi: 0.40 },
+    { name: "Guwahati", lat: 26.1445, lon: 91.7362, aqi: 0.52 },
+    { name: "Shillong", lat: 25.5788, lon: 91.8933, aqi: 0.38 },
+    { name: "Gangtok", lat: 27.3389, lon: 88.6065, aqi: 0.35 },
+    { name: "Aizawl", lat: 23.7271, lon: 92.7176, aqi: 0.41 },
+
+    { name: "Srinagar", lat: 34.0837, lon: 74.7973, aqi: 0.44 },
+    { name: "Jammu", lat: 32.7266, lon: 74.8570, aqi: 0.49 },
+    { name: "Shimla", lat: 31.1048, lon: 77.1734, aqi: 0.47 },
+    { name: "Dharamshala", lat: 32.2190, lon: 76.3234, aqi: 0.43 },
+
+    { name: "Vadodara", lat: 22.3072, lon: 73.1812, aqi: 0.65 },
+    { name: "Cuttack", lat: 20.4625, lon: 85.8830, aqi: 0.60 },
+    { name: "Agra", lat: 27.1767, lon: 78.0081, aqi: 0.80 },
+
+    { name: "Kanpur", lat: 26.4499, lon: 80.3319, aqi: 0.76 },
+    { name: "Varanasi", lat: 25.3217, lon: 82.9873, aqi: 0.78 },
+    { name: "Prayagraj", lat: 25.4358, lon: 81.8463, aqi: 0.70 },
+    { name: "Meerut", lat: 28.9846, lon: 77.7060, aqi: 0.72 },
+    { name: "Visakhapatnam", lat: 17.6868, lon: 83.2185, aqi: 0.55 },
+    { name: "Madurai", lat: 9.9252, lon: 78.1198, aqi: 0.50 },
+    { name: "Jodhpur", lat: 26.2389, lon: 73.0243, aqi: 0.61 },
+    { name: "Ranchi", lat: 23.3441, lon: 85.3096, aqi: 0.64 },
+    { name: "Jamshedpur", lat: 22.8056, lon: 86.2029, aqi: 0.66 },
+    { name: "Gwalior", lat: 26.2183, lon: 78.1828, aqi: 0.63 }
   ];
+
+  // Prepare data for Heatmap (requires [lat, lon, intensity])
+  var aqiData = cities.map(city => [city.lat, city.lon, city.aqi]);
+
+  // 🔥 ADD HEATMAP LAYER
   if (typeof L !== 'undefined' && L.heatLayer) {
     L.heatLayer(aqiData, {
-      radius: 40,
-      blur: 18,
-      maxZoom: 17,
-      max: 1,
-      minOpacity: 0.3,
-      gradient: { 0.25: 'blue', 0.45: 'lime', 0.65: 'yellow', 0.85: 'orange', 1: 'red' }
+      radius: 35,
+      blur: 20,
+      maxZoom: 12,
+      max: 1.0,
+      minOpacity: 0.4,
+      gradient: {
+        0.0: 'blue',
+        0.4: 'cyan',
+        0.6: 'lime',
+        0.8: 'orange',
+        1.0: 'red'
+      }
     }).addTo(map);
+  }
+
+
+  // 🔍 SEARCH FUNCTIONALITY
+  const searchInput = document.querySelector(".search-bar");
+  const searchBtn = document.querySelector(".search-btn");
+
+  function searchCity() {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) return;
+
+    // Find city (exact or partial match)
+    const city = cities.find(c => c.name.toLowerCase() === query);
+
+    if (city) {
+      // ✈️ Fly to the city
+      map.flyTo([city.lat, city.lon], 12, {
+        animate: true,
+        duration: 1.5
+      });
+
+      // 📍 Add a temporary popup
+      L.popup()
+        .setLatLng([city.lat, city.lon])
+        .setContent(`
+          <div style="text-align: center;">
+            <h3 style="margin: 0; color: #333;">${city.name}</h3>
+            <p style="margin: 5px 0;">AQI Intensity: <strong>${city.aqi}</strong></p>
+          </div>
+        `)
+        .openOn(map);
+
+    } else {
+      alert("City not found! Please try a major Indian city like 'Delhi', 'Mumbai', 'Indore', etc.");
+    }
+  }
+
+  // 🖱️ Event Listeners
+  if (searchBtn) {
+    searchBtn.addEventListener("click", searchCity);
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        searchCity();
+      }
+    });
   }
 
   // 📍 USER LOCATION DETECTION
   if (navigator.geolocation) {
 
-    navigator.geolocation.getCurrentPosition(function(position) {
+    navigator.geolocation.getCurrentPosition(function (position) {
 
       var lat = position.coords.latitude;
       var lon = position.coords.longitude;
@@ -45,7 +159,7 @@ window.onload = function () {
         .bindPopup("📍 You are here")
         .openPopup();
 
-    }, function() {
+    }, function () {
       alert("Location access denied. Showing default map view.");
     });
 
@@ -86,45 +200,106 @@ window.onload = function () {
 };
 
 
+// 🤖 AI CHATBOT LOGIC
 document.addEventListener("DOMContentLoaded", () => {
+  const chatInput = document.querySelector("#chat-input");
+  const sendBtn = document.querySelector("#send-btn");
+  const chatMessages = document.querySelector("#chat-messages");
 
-  const btn = document.getElementById("chatbot-btn");
-  const box = document.getElementById("chatbot-box");
-  const close = document.getElementById("chatbot-close");
-  const input = document.getElementById("chatbot-input");
-  const messages = document.getElementById("chatbot-messages");
+  // 🔑 API KEY (Placeholder)
+  // ⚠️ REPLACE THIS WITH YOUR ACTUAL API KEY
+  // 🔑 API KEY (From config.js)
+  const OPENAI_API_KEY = typeof CONFIG !== 'undefined' ? CONFIG.OPENAI_API_KEY : "";
 
-  btn.onclick = () => {
-    box.style.display = "flex";
-    input.focus(); // 🔑 FORCE keyboard focus
-  };
+  function appendMessage(text, sender) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("message", sender);
 
-  close.onclick = () => {
-    box.style.display = "none";
-  };
+    // Create inner content
+    const contentDiv = document.createElement("div");
+    contentDiv.classList.add("msg-content");
+    contentDiv.textContent = text;
 
-  input.addEventListener("keydown", (e) => {
-    e.stopPropagation(); // 🔥 stop map stealing keyboard
-    if (e.key === "Enter" && input.value.trim() !== "") {
+    msgDiv.appendChild(contentDiv);
+    chatMessages.appendChild(msgDiv);
 
-      const user = document.createElement("div");
-      user.className = "user";
-      user.textContent = input.value;
-      messages.appendChild(user);
+    // Auto-scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 
-      const bot = document.createElement("div");
-      bot.className = "bot";
-      bot.textContent = "Analyzing AQI request…";
+  function getMockResponse(input) {
+    const lower = input.toLowerCase();
+    if (lower.includes("hello") || lower.includes("hi")) return "Hello! I'm your AI Assistant (Demo Mode). Ask me about AQI or health tips!";
+    if (lower.includes("aqi") || lower.includes("pollution")) return "The Air Quality Index (AQI) is a measure of how polluted the air is. High AQI means poor air quality!";
+    if (lower.includes("health") || lower.includes("safe")) return "On high AQI days, it's best to wear a mask and limit outdoor activities. Stay safe!";
+    return "I am currently in Demo Mode (API Quota Exceeded). I can answer simple questions about AQI and Health!";
+  }
 
-      setTimeout(() => {
-        messages.appendChild(bot);
-        messages.scrollTop = messages.scrollHeight;
-      }, 500);
-
-      input.value = "";
+  async function getBotResponse(userMessage) {
+    if (!OPENAI_API_KEY || OPENAI_API_KEY.includes("YOUR")) {
+      return "I can't connect to the server right now (Missing API Key). But I can tell you that reducing car usage helps AQI!";
     }
-  });
 
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: userMessage }]
+        })
+      });
+
+      const data = await response.json();
+
+      // Check for API errors
+      if (!response.ok) {
+        const errorMessage = data.error?.message || "";
+
+        // ⚠️ FALLBACK: If quota exceeded, use local mock bot
+        if (errorMessage.includes("quota") || errorMessage.includes("insufficient_quota")) {
+          return getMockResponse(userMessage);
+        }
+
+        return `⚠️ API Error: ${errorMessage}`;
+      }
+
+      if (data.choices && data.choices.length > 0) {
+        return data.choices[0].message.content;
+      } else {
+        return "I'm having trouble processing that thought (Empty response).";
+      }
+    } catch (error) {
+      console.error("Chatbot Error:", error);
+      return "Sorry, connection failed. Please check your internet.";
+    }
+  }
+
+  async function handleChat() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    appendMessage(text, "user");
+    chatInput.value = "";
+
+    const botReply = await getBotResponse(text);
+
+    appendMessage(botReply, "bot");
+  }
+
+  // Event Listeners
+  if (sendBtn) {
+    sendBtn.addEventListener("click", handleChat);
+  }
+
+  if (chatInput) {
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleChat();
+    });
+  }
 });
 
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | AEROpulse</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 40px;
+            background: #f1f5f9;
+        }
+
+        h1 {
+            color: #0f172a;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .high-aqi {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🚨 Alert Admin Dashboard</h1>
+        <p>Manage subscribers and trigger alerts for high AQI zones.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Current AQI</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="subscriberTable">
+                <!-- Rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="script1.js"></script>
+    <script>
+        // Initialize Admin View
+        document.addEventListener("DOMContentLoaded", loadSubscribers);
+    </script>
+
+</body>
+
+</html>
